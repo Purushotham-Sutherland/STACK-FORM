@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Forum - Stack Overflow Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .stackoverflow-orange {
+            background-color: #f48024;
+        }
+
+        .stackoverflow-orange:hover {
+            background-color: #da670b;
+        }
+
+        .vote-arrow {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .vote-arrow.up {
+            border-bottom: 15px solid #babfc4;
+        }
+
+        .vote-arrow.down {
+            border-top: 15px solid #babfc4;
+        }
+
+        .vote-arrow.up.active {
+            border-bottom-color: #f48024;
+        }
+
+        .vote-arrow.down.active {
+            border-top-color: #f48024;
+        }
+
+        .vote-arrow:hover {
+            transform: scale(1.1);
+        }
+
+        .question-stats {
+            font-size: 11px;
+            color: #6a737c;
+        }
+
+        .user-card {
+            background: #d9eaf7;
+            border-radius: 3px;
+            padding: 5px 6px 7px 7px;
+            font-size: 11px;
+        }
+
+        .answer-section {
+            border-top: 1px solid #e4e6ea;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div class="max-w-md w-full space-y-8 p-8">
+            <div class="text-center">
+                <div class="mx-auto h-20 w-20 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.986 10.5l-6.5 3.75v-7.5l6.5 3.75zm-13.5 0l6.5-3.75v7.5l-6.5-3.75z" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900">Student Forum</h2>
+                <p class="mt-2 text-sm text-gray-600">Sign in to your account</p>
+            </div>
+            <form id="loginForm" class="mt-8 space-y-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                        <input id="email" type="email" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Password</label>
+                        <input id="password" type="password" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                </div>
+                <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white stackoverflow-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                    Sign In
+                </button>
+                <div class="text-center">
+                    <p class="text-xs text-gray-500">Demo: Use any email and password to login</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Forum -->
+    <div id="forumScreen" class="hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-300 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex items-center justify-between h-14">
+                    <div class="flex items-center space-x-8">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
+                                <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M18.986 10.5l-6.5 3.75v-7.5l6.5 3.75zm-13.5 0l6.5-3.75v7.5l-6.5-3.75z" />
+                                </svg>
+                            </div>
+                            <span class="text-xl font-bold text-gray-900">student<span
+                                    class="font-normal">forum</span></span>
+                        </div>
+                        <nav class="flex space-x-6">
+                            <a href="#"
+                                class="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Questions</a>
+                            <a href="#" class="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Tags</a>
+                            <a href="#"
+                                class="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Users</a>
+                        </nav>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="showAskQuestion()"
+                            class="stackoverflow-orange text-white px-3 py-2 rounded text-sm font-medium hover:bg-orange-600">
+                            Ask Question
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-medium" id="userInitials">U</span>
+                            </div>
+                            <span class="text-sm text-gray-700" id="userName">User</span>
+                            <button onclick="logout()" class="text-sm text-gray-500 hover:text-gray-700">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex">
+                <!-- Sidebar -->
+                <div class="w-64 mr-8">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
+                        <h3 class="font-semibold text-sm mb-2">The Overflow Blog</h3>
+                        <ul class="text-sm space-y-1">
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800">Study tips for students</a></li>
+                            <li><a href="#" class="text-blue-600 hover:text-blue-800">Best coding practices</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Questions List -->
+                <div class="flex-1">
+                    <!-- Ask Question Form (Hidden by default) -->
+                    <div id="askQuestionForm" class="hidden bg-white border border-gray-300 rounded p-6 mb-6">
+                        <h2 class="text-xl font-semibold mb-4">Ask a Question</h2>
+                        <form id="questionForm">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                <input type="text" id="questionTitle" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="What's your programming question? Be specific.">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Body</label>
+                                <textarea id="questionBody" rows="6" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Include all the information someone would need to answer your question"></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                                <input type="text" id="questionTags"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="e.g. javascript python html">
+                            </div>
+                            <div class="flex space-x-3">
+                                <button type="submit"
+                                    class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium">
+                                    Post Your Question
+                                </button>
+                                <button type="button" onclick="hideAskQuestion()"
+                                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-400">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Questions Header -->
+                    <div class="flex items-center justify-between mb-6">
+                        <h1 class="text-2xl font-semibold">All Questions</h1>
+                        <button onclick="showAskQuestion()"
+                            class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium">
+                            Ask Question
+                        </button>
+                    </div>
+
+                    <!-- Questions List -->
+                    <div id="questionsList" class="space-y-0">
+                        <!-- Questions will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Initialize data object
+        const data = {
+            users: [],
+            questions: []
+        };
+
+        // Load and Save Data
+        function loadData() {
+            const usersStr = localStorage.getItem('users');
+            if (usersStr) data.users = JSON.parse(usersStr);
+
+            const questionsStr = localStorage.getItem('questions');
+            if (questionsStr) data.questions = JSON.parse(questionsStr);
+        }
+
+        function saveData() {
+            localStorage.setItem('users', JSON.stringify(data.users));
+            localStorage.setItem('questions', JSON.stringify(data.questions));
+        }
+
+        // User Login
+        function loginUser(email, displayName) {
+            let user = data.users.find(u => u.email === email);
+            if (!user) {
+                user = {
+                    email,
+                    name: displayName,
+                    initials: displayName.charAt(0).toUpperCase()
+                };
+                data.users.push(user);
+                saveData();
+            }
+            return user;
+        }
+
+        // Add Question
+        function addQuestion(title, body, tags) {
+            const question = {
+                id: Date.now(),
+                title,
+                body,
+                tags: tags ? tags.split(' ').filter(tag => tag.trim()) : [],
+                user: currentUser,
+                votes: 0,
+                answers: [],
+                views: 1,
+                created: new Date().toISOString()
+            };
+            data.questions.unshift(question);
+            saveData();
+            renderQuestions();
+        }
+
+        // Add Answer
+        function addAnswer(questionId, answerText) {
+            const question = data.questions.find(q => q.id === questionId);
+            if (question) {
+                const answer = {
+                    id: Date.now(),
+                    body: answerText,
+                    user: currentUser,
+                    votes: 0,
+                    created: new Date().toISOString()
+                };
+                question.answers.push(answer);
+                saveData();
+                renderQuestions();
+            }
+        }
+
+        // Voting
+        function voteQuestion(questionId, direction) {
+            const question = data.questions.find(q => q.id === questionId);
+            if (question) {
+                question.votes += direction === 'up' ? 1 : -1;
+                saveData();
+                renderQuestions();
+            }
+        }
+
+        function voteAnswer(questionId, answerId, direction) {
+            const question = data.questions.find(q => q.id === questionId);
+            if (question) {
+                const answer = question.answers.find(a => a.id === answerId);
+                if (answer) {
+                    answer.votes += direction === 'up' ? 1 : -1;
+                    saveData();
+                    renderQuestions();
+                }
+            }
+        }
+
+        // Render Functions
+        function renderQuestions() {
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            data.questions.forEach(q => {
+                const tagsHTML = q.tags.map(tag =>
+                    `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${tag}</span>`
+                ).join(' ');
+                const answersCount = q.answers.length;
+                const questionHTML = `
+                    <div class="question-item border-b border-gray-200 py-4 flex">
+                        <div class="w-24 text-right mr-4 text-sm">
+                            <div class="mb-1">
+                                <span class="font-semibold">${q.votes}</span>
+                                <div class="question-stats">votes</div>
+                            </div>
+                            <div class="mb-1">
+                                <span class="font-semibold answer-count">${answersCount}</span>
+                                <div class="question-stats">answers</div>
+                            </div>
+                            <div>
+                                <span class="font-semibold">${q.views}</span>
+                                <div class="question-stats">views</div>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-blue-600 hover:text-blue-800 cursor-pointer text-lg mb-2" onclick="toggleAnswers(this)">
+                                ${q.title}
+                            </h3>
+                            <p class="text-gray-700 text-sm mb-3">${q.body}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    ${tagsHTML}
+                                </div>
+                                <div class="user-card">
+                                    <div class="text-blue-600 text-xs">asked ${new Date(q.created).toLocaleString()}</div>
+                                    <div class="flex items-center space-x-1 mt-1">
+                                        <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                                        <span class="text-blue-600 font-medium">${q.user.name}</span>
+                                        <span class="text-gray-600">1</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="answers-section hidden mt-6">
+                                <div class="answer-section">
+                                    <h4 class="font-semibold mb-4">${answersCount} Answer${answersCount !== 1 ? 's' : ''}</h4>
+                                    ${renderAnswers(q)}
+                                    <div class="mt-6 border-t border-gray-200 pt-6">
+                                        <h5 class="font-semibold mb-3">Your Answer</h5>
+                                        <form class="answer-form" onsubmit="addAnswerHandler(event, ${q.id})">
+                                            <textarea rows="6" required
+                                                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-3"
+                                                placeholder="Write your answer here..."></textarea>
+                                            <button type="submit" class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium">
+                                                Post Your Answer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                questionsList.insertAdjacentHTML('beforeend', questionHTML);
+            });
+        }
+
+        function renderAnswers(question) {
+            return question.answers.map(a => `
+                <div class="answer mb-6 flex">
+                    <div class="w-12 mr-4 flex flex-col items-center">
+                        <div class="vote-arrow up" onclick="voteAnswerHandler(${question.id}, ${a.id}, 'up')"></div>
+                        <div class="vote-count text-lg font-bold text-gray-600 my-2">${a.votes}</div>
+                        <div class="vote-arrow down" onclick="voteAnswerHandler(${question.id}, ${a.id}, 'down')"></div>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-gray-700 mb-4">
+                            <p>${a.body}</p>
+                        </div>
+                        <div class="user-card inline-block">
+                            <div class="text-blue-600 text-xs">answered ${new Date(a.created).toLocaleString()}</div>
+                            <div class="flex items-center space-x-1 mt-1">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                                <span class="text-blue-600 font-medium">${a.user.name}</span>
+                                <span class="text-gray-600">1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Toggle Answers Section
+        function toggleAnswers(titleElement) {
+            const answersSection = titleElement.closest('.question-item').querySelector('.answers-section');
+            const isHidden = answersSection.classList.contains('hidden');
+            if (isHidden) {
+                answersSection.classList.remove('hidden');
+                answersSection.classList.add('fade-in');
+                titleElement.textContent = titleElement.textContent + ' (Hide Answers)';
+            } else {
+                answersSection.classList.add('hidden');
+                titleElement.textContent = titleElement.textContent.replace(' (Hide Answers)', '');
+            }
+        }
+
+        // Answer Form Handler
+        function addAnswerHandler(event, questionId) {
+            event.preventDefault();
+            const textarea = event.target.querySelector('textarea');
+            addAnswer(questionId, textarea.value);
+            textarea.value = '';
+        }
+
+        // Voting Handlers
+        function voteAnswerHandler(questionId, answerId, direction) {
+            voteAnswer(questionId, answerId, direction);
+        }
+
+        // Question Voting (for future use)
+        function voteQuestionHandler(questionId, direction) {
+            voteQuestion(questionId, direction);
+        }
+
+        // Show/Hide Ask Question Form
+        function showAskQuestion() {
+            document.getElementById('askQuestionForm').classList.remove('hidden');
+            document.getElementById('askQuestionForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideAskQuestion() {
+            document.getElementById('askQuestionForm').classList.add('hidden');
+            document.getElementById('questionForm').reset();
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('forumScreen').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+        }
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (email && password) {
+                const name = email.split('@')[0].replace(/[^a-zA-Z]/g, '');
+                const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+
+                currentUser = loginUser(email, displayName);
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userInitials').textContent = currentUser.initials;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('forumScreen').classList.remove('hidden');
+            }
+        });
+
+        // Question Form Handler
+        document.getElementById('questionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const title = document.getElementById('questionTitle').value;
+            const body = document.getElementById('questionBody').value;
+            const tags = document.getElementById('questionTags').value;
+            if (title && body) {
+                addQuestion(title, body, tags);
+                hideAskQuestion();
+            }
+        });
+
+        // Initial Load
+        window.onload = () => {
+            loadData();
+            renderQuestions();
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userInitials').textContent = currentUser.initials;
+            }
+        };
+    </script>
+</body>
+
+</html>
