@@ -7,80 +7,23 @@
     <title>Student Forum - Stack Overflow Style</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            box-sizing: border-box;
-        }
-
+        body { box-sizing: border-box; }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
         }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .stackoverflow-orange {
-            background-color: #f48024;
-        }
-
-        .stackoverflow-orange:hover {
-            background-color: #da670b;
-        }
-
-        .vote-arrow {
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .vote-arrow.up {
-            border-bottom: 15px solid #babfc4;
-        }
-
-        .vote-arrow.down {
-            border-top: 15px solid #babfc4;
-        }
-
-        .vote-arrow.up.active {
-            border-bottom-color: #f48024;
-        }
-
-        .vote-arrow.down.active {
-            border-top-color: #f48024;
-        }
-
-        .vote-arrow:hover {
-            transform: scale(1.1);
-        }
-
-        .question-stats {
-            font-size: 11px;
-            color: #6a737c;
-        }
-
-        .user-card {
-            background: #d9eaf7;
-            border-radius: 3px;
-            padding: 5px 6px 7px 7px;
-            font-size: 11px;
-        }
-
-        .answer-section {
-            border-top: 1px solid #e4e6ea;
-            margin-top: 20px;
-            padding-top: 20px;
-        }
+        .fade-in { animation: fadeIn 0.3s ease-out;}
+        .stackoverflow-orange { background-color: #f48024;}
+        .stackoverflow-orange:hover { background-color: #da670b;}
+        .vote-arrow { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; cursor: pointer; transition: all 0.2s ease;}
+        .vote-arrow.up { border-bottom: 15px solid #babfc4;}
+        .vote-arrow.down { border-top: 15px solid #babfc4;}
+        .vote-arrow.up.active { border-bottom-color: #f48024;}
+        .vote-arrow.down.active { border-top-color: #f48024;}
+        .vote-arrow:hover { transform: scale(1.1);}
+        .question-stats { font-size: 11px; color: #6a737c;}
+        .user-card { background: #d9eaf7; border-radius: 3px; padding: 5px 6px 7px 7px; font-size: 11px;}
+        .answer-section { border-top: 1px solid #e4e6ea; margin-top: 20px; padding-top: 20px;}
     </style>
 </head>
 
@@ -230,116 +173,136 @@
             </div>
         </div>
     </div>
-
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script>
-        let currentUser = null;
-
-        // Initialize data object
-        const data = {
-            users: [],
-            questions: []
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnQ0s1jFoMH6J7vhKVM7NVC-WNScLdA7E",
+            authDomain: "sutherland-6ce2b.firebaseapp.com",
+            databaseURL: "https://sutherland-6ce2b-default-rtdb.firebaseio.com",
+            projectId: "sutherland-6ce2b",
+            storageBucket: "sutherland-6ce2b.firebasestorage.app",
+            messagingSenderId: "243800407888",
+            appId: "1:243800407888:web:2c4dfa1e6a267ba2a17655",
+            measurementId: "G-S6GMQ32JJ5"
         };
 
-        // Load and Save Data
-        function loadData() {
-            const usersStr = localStorage.getItem('users');
-            if (usersStr) data.users = JSON.parse(usersStr);
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-            const questionsStr = localStorage.getItem('questions');
-            if (questionsStr) data.questions = JSON.parse(questionsStr);
+        let currentUser = null;
+
+        // Show/Hide Ask Question Form
+        function showAskQuestion() {
+            document.getElementById('askQuestionForm').classList.remove('hidden');
+            document.getElementById('askQuestionForm').scrollIntoView({ behavior: 'smooth' });
+        }
+        function hideAskQuestion() {
+            document.getElementById('askQuestionForm').classList.add('hidden');
+            document.getElementById('questionForm').reset();
         }
 
-        function saveData() {
-            localStorage.setItem('users', JSON.stringify(data.users));
-            localStorage.setItem('questions', JSON.stringify(data.questions));
-        }
-
-        // User Login
-        function loginUser(email, displayName) {
-            let user = data.users.find(u => u.email === email);
-            if (!user) {
-                user = {
-                    email,
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (email && password) {
+                const name = email.split('@')[0].replace(/[^a-zA-Z]/g, '');
+                const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+                currentUser = {
+                    email: email,
                     name: displayName,
                     initials: displayName.charAt(0).toUpperCase()
                 };
-                data.users.push(user);
-                saveData();
+                // Save user to Firebase (optional, for user list)
+                database.ref("users/" + currentUser.email.replace(/\./g, "_")).set(currentUser);
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userInitials').textContent = currentUser.initials;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('forumScreen').classList.remove('hidden');
             }
-            return user;
+        });
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('forumScreen').classList.add('hidden');
+            document.getElementById('loginForm').reset();
         }
 
         // Add Question
-        function addQuestion(title, body, tags) {
-            const question = {
-                id: Date.now(),
-                title,
-                body,
-                tags: tags ? tags.split(' ').filter(tag => tag.trim()) : [],
-                user: currentUser,
-                votes: 0,
-                answers: [],
-                views: 1,
-                created: new Date().toISOString()
-            };
-            data.questions.unshift(question);
-            saveData();
-            renderQuestions();
-        }
-
-        // Add Answer
-        function addAnswer(questionId, answerText) {
-            const question = data.questions.find(q => q.id === questionId);
-            if (question) {
-                const answer = {
+        document.getElementById('questionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const title = document.getElementById('questionTitle').value;
+            const body = document.getElementById('questionBody').value;
+            const tags = document.getElementById('questionTags').value;
+            if (title && body && currentUser) {
+                const question = {
                     id: Date.now(),
-                    body: answerText,
+                    title,
+                    body,
+                    tags: tags ? tags.split(' ').filter(tag => tag.trim()) : [],
                     user: currentUser,
                     votes: 0,
+                    answers: [],
+                    views: 1,
                     created: new Date().toISOString()
                 };
-                question.answers.push(answer);
-                saveData();
-                renderQuestions();
+                database.ref("questions/" + question.id).set(question);
+                hideAskQuestion();
             }
+        });
+
+        // Add Answer
+        function addAnswerHandler(event, questionId) {
+            event.preventDefault();
+            const textarea = event.target.querySelector('textarea');
+            const answerText = textarea.value;
+            if (!answerText.trim() || !currentUser) return;
+            const answer = {
+                id: Date.now(),
+                body: answerText,
+                user: currentUser,
+                votes: 0,
+                created: new Date().toISOString()
+            };
+            // Push answer to Firebase under the question
+            database.ref("questions/" + questionId + "/answers/" + answer.id).set(answer);
+            textarea.value = '';
         }
 
         // Voting
-        function voteQuestion(questionId, direction) {
-            const question = data.questions.find(q => q.id === questionId);
-            if (question) {
-                question.votes += direction === 'up' ? 1 : -1;
-                saveData();
-                renderQuestions();
-            }
+        function voteQuestionHandler(questionId, direction) {
+            database.ref("questions/" + questionId + "/votes").transaction(function (votes) {
+                return (votes || 0) + (direction === 'up' ? 1 : -1);
+            });
         }
-
-        function voteAnswer(questionId, answerId, direction) {
-            const question = data.questions.find(q => q.id === questionId);
-            if (question) {
-                const answer = question.answers.find(a => a.id === answerId);
-                if (answer) {
-                    answer.votes += direction === 'up' ? 1 : -1;
-                    saveData();
-                    renderQuestions();
-                }
-            }
+        function voteAnswerHandler(questionId, answerId, direction) {
+            database.ref("questions/" + questionId + "/answers/" + answerId + "/votes").transaction(function (votes) {
+                return (votes || 0) + (direction === 'up' ? 1 : -1);
+            });
         }
 
         // Render Functions
-        function renderQuestions() {
+        function renderQuestions(questionsObj) {
             const questionsList = document.getElementById('questionsList');
             questionsList.innerHTML = '';
-            data.questions.forEach(q => {
-                const tagsHTML = q.tags.map(tag =>
+            if (!questionsObj) return;
+            // Convert object to array and sort by created desc
+            const questionsArr = Object.values(questionsObj).sort((a, b) => b.id - a.id);
+            questionsArr.forEach(q => {
+                const tagsHTML = q.tags ? q.tags.map(tag =>
                     `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${tag}</span>`
-                ).join(' ');
-                const answersCount = q.answers.length;
+                ).join(' ') : '';
+                const answersCount = q.answers ? Object.keys(q.answers).length : 0;
                 const questionHTML = `
                     <div class="question-item border-b border-gray-200 py-4 flex">
                         <div class="w-24 text-right mr-4 text-sm">
                             <div class="mb-1">
-                                <span class="font-semibold">${q.votes}</span>
+                                <span class="font-semibold">${q.votes || 0}</span>
                                 <div class="question-stats">votes</div>
                             </div>
                             <div class="mb-1">
@@ -347,7 +310,7 @@
                                 <div class="question-stats">answers</div>
                             </div>
                             <div>
-                                <span class="font-semibold">${q.views}</span>
+                                <span class="font-semibold">${q.views || 1}</span>
                                 <div class="question-stats">views</div>
                             </div>
                         </div>
@@ -364,7 +327,7 @@
                                     <div class="text-blue-600 text-xs">asked ${new Date(q.created).toLocaleString()}</div>
                                     <div class="flex items-center space-x-1 mt-1">
                                         <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
-                                        <span class="text-blue-600 font-medium">${q.user.name}</span>
+                                        <span class="text-blue-600 font-medium">${q.user ? q.user.name : ''}</span>
                                         <span class="text-gray-600">1</span>
                                     </div>
                                 </div>
@@ -394,11 +357,12 @@
         }
 
         function renderAnswers(question) {
-            return question.answers.map(a => `
+            if (!question.answers) return '';
+            return Object.values(question.answers).map(a => `
                 <div class="answer mb-6 flex">
                     <div class="w-12 mr-4 flex flex-col items-center">
                         <div class="vote-arrow up" onclick="voteAnswerHandler(${question.id}, ${a.id}, 'up')"></div>
-                        <div class="vote-count text-lg font-bold text-gray-600 my-2">${a.votes}</div>
+                        <div class="vote-count text-lg font-bold text-gray-600 my-2">${a.votes || 0}</div>
                         <div class="vote-arrow down" onclick="voteAnswerHandler(${question.id}, ${a.id}, 'down')"></div>
                     </div>
                     <div class="flex-1">
@@ -409,7 +373,7 @@
                             <div class="text-blue-600 text-xs">answered ${new Date(a.created).toLocaleString()}</div>
                             <div class="flex items-center space-x-1 mt-1">
                                 <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
-                                <span class="text-blue-600 font-medium">${a.user.name}</span>
+                                <span class="text-blue-600 font-medium">${a.user ? a.user.name : ''}</span>
                                 <span class="text-gray-600">1</span>
                             </div>
                         </div>
@@ -432,83 +396,16 @@
             }
         }
 
-        // Answer Form Handler
-        function addAnswerHandler(event, questionId) {
-            event.preventDefault();
-            const textarea = event.target.querySelector('textarea');
-            addAnswer(questionId, textarea.value);
-            textarea.value = '';
-        }
-
-        // Voting Handlers
-        function voteAnswerHandler(questionId, answerId, direction) {
-            voteAnswer(questionId, answerId, direction);
-        }
-
-        // Question Voting (for future use)
-        function voteQuestionHandler(questionId, direction) {
-            voteQuestion(questionId, direction);
-        }
-
-        // Show/Hide Ask Question Form
-        function showAskQuestion() {
-            document.getElementById('askQuestionForm').classList.remove('hidden');
-            document.getElementById('askQuestionForm').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function hideAskQuestion() {
-            document.getElementById('askQuestionForm').classList.add('hidden');
-            document.getElementById('questionForm').reset();
-        }
-
-        // Logout
-        function logout() {
-            currentUser = null;
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('forumScreen').classList.add('hidden');
-            document.getElementById('loginForm').reset();
-        }
-
-        // Login Form Handler
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (email && password) {
-                const name = email.split('@')[0].replace(/[^a-zA-Z]/g, '');
-                const displayName = name.charAt(0).toUpperCase() + name.slice(1);
-
-                currentUser = loginUser(email, displayName);
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userInitials').textContent = currentUser.initials;
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('forumScreen').classList.remove('hidden');
-            }
+        // Listen for questions in Firebase
+        database.ref("questions").on("value", function (snapshot) {
+            renderQuestions(snapshot.val());
         });
 
-        // Question Form Handler
-        document.getElementById('questionForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const title = document.getElementById('questionTitle').value;
-            const body = document.getElementById('questionBody').value;
-            const tags = document.getElementById('questionTags').value;
-            if (title && body) {
-                addQuestion(title, body, tags);
-                hideAskQuestion();
-            }
-        });
-
-        // Initial Load
-        window.onload = () => {
-            loadData();
-            renderQuestions();
-            if (currentUser) {
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userInitials').textContent = currentUser.initials;
-            }
-        };
+        // Expose voting functions to global scope for inline onclick
+        window.voteQuestionHandler = voteQuestionHandler;
+        window.voteAnswerHandler = voteAnswerHandler;
+        window.toggleAnswers = toggleAnswers;
+        window.addAnswerHandler = addAnswerHandler;
     </script>
 </body>
-
 </html>
