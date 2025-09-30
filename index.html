@@ -5,12 +5,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Forum - Stack Overflow Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Base styles & Fonts */
         body {
             box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            color: #232629;
+            background-color: #f1f2f3;
         }
 
+        /* Animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -27,6 +33,21 @@
             animation: fadeIn 0.3s ease-out;
         }
 
+        /* Auth Modal Backdrop */
+        #loginScreen:not(.hidden) {
+            background-color: rgba(0, 0, 0, 0.4);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Color Scheme */
         .stackoverflow-orange {
             background-color: #f48024;
         }
@@ -35,57 +56,225 @@
             background-color: #da670b;
         }
 
+        .link-blue {
+            color: #0077cc;
+        }
+
+        .link-blue:hover {
+            color: #0095ff;
+        }
+        
+        /* Navbar Custom Styling (NEW) */
+        header {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            /* Soft shadow */
+        }
+        .forum-logo-text {
+            color: #3d3d3d;
+            font-weight: 500;
+        }
+
+        /* Voting Arrows - Stack Overflow Style */
         .vote-arrow {
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
             cursor: pointer;
             transition: all 0.2s ease;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.7;
+        }
+
+        .vote-arrow:hover {
+            opacity: 1;
         }
 
         .vote-arrow.up {
-            border-bottom: 15px solid #babfc4;
+            border-bottom: 12px solid #babfc4;
         }
 
         .vote-arrow.down {
-            border-top: 15px solid #babfc4;
+            border-top: 12px solid #babfc4;
         }
 
-        .vote-arrow.up:hover {
+        /* Voted State - Orange */
+        .vote-arrow.up.voted {
+            border-bottom-color: #f48024;
+            opacity: 1;
+        }
+
+        .vote-arrow.down.voted {
+            border-top-color: #f48024;
+            opacity: 1;
+        }
+
+        /* Hover on not-voted should show orange */
+        .vote-arrow.up:not(.voted):hover {
             border-bottom-color: #f48024;
         }
 
-        .vote-arrow.down:hover {
+        .vote-arrow.down:not(.voted):hover {
             border-top-color: #f48024;
         }
 
-        .question-stats {
+        /* Disabled voting for non-logged-in/admin users or general disabled state*/
+        .vote-arrow.disabled,
+        .vote-arrow.disabled:hover {
+            cursor: default !important;
+            opacity: 0.3 !important;
+        }
+
+        .vote-arrow.disabled.up,
+        .vote-arrow.disabled.up:hover {
+            border-bottom-color: #babfc4 !important;
+        }
+
+        .vote-arrow.disabled.down,
+        .vote-arrow.disabled.down:hover {
+            border-top-color: #babfc4 !important;
+        }
+
+
+        /* Question List Item */
+        .question-item {
+            display: flex;
+            border-bottom: 1px solid #e4e6ea;
+            padding: 16px 0;
+            background-color: #ffffff;
+        }
+
+        /* Stats Block (Hidden for new horizontal UI) */
+        .question-stats-container {
+            width: 108px;
+            display: none;
+        }
+
+        /* New Horizontal Stats Bar */
+        .horizontal-stats {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #6a737c;
+            margin-right: 15px;
+        }
+
+        .stat-item {
+            margin-left: 10px;
+            line-height: 1;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            color: #000;
+        }
+
+        .stat-label {
             font-size: 11px;
+        }
+
+        .answer-stat-green .stat-number {
+            color: #6bb264;
+        }
+
+        .answer-stat-green .stat-label {
+            color: #6bb264;
+            font-weight: 500;
+        }
+
+        .answer-stat-zero .stat-number {
             color: #6a737c;
         }
 
-        .user-card {
-            background: #d9eaf7;
-            border-radius: 3px;
-            padding: 5px 6px 7px 7px;
-            font-size: 11px;
+        .answer-stat-zero .stat-label {
+            color: #6a737c;
         }
 
-        .answer-section {
-            border-top: 1px solid #e4e6ea;
+
+        /* Question Title/Link */
+        .question-title-link {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Tag Styling */
+        .tag-style {
+            background-color: #e1ecf4;
+            color: #39739d;
+            padding: 4px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* User Card */
+        .user-card {
+            font-size: 12px;
+            text-align: right;
+            min-width: 120px;
+            line-height: 1.3;
+        }
+
+        .user-name {
+            color: #0077cc;
+            font-weight: 500;
+        }
+
+        /* Answer Detail Section */
+        .answers-section-detail {
             margin-top: 20px;
             padding-top: 20px;
+        }
+
+        /* Pre-wrap for question/answer body (allows line breaks, simple styling) */
+        .body-content {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Toast Notification Styling (FIXED) */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast {
+            position: relative;
+            background-color: #38a169;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateY(-100%);
+            margin-bottom: 10px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 
 <body class="bg-white">
-    <div id="loginScreen" class="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div class="max-w-md w-full space-y-8 p-8">
+    <div id="toast-container"></div>
+
+    <div id="loginScreen"
+        class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+        <div
+            class="max-w-md w-full space-y-8 p-8 bg-white shadow-2xl rounded-lg transform transition-all duration-300 scale-100 fade-in">
             <div class="text-center">
-                <div class="mx-auto h-20 w-20 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
-                    <svg class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div
+                    class="mx-auto h-16 w-16 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="h-10 w-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M18.986 10.5l-6.5 3.75v-7.5l6.5 3.75zm-13.5 0l6.5-3.75v7.5l-6.5-3.75z" />
                     </svg>
                 </div>
@@ -97,24 +286,24 @@
                     <div id="nameInputContainer" class="hidden">
                         <label class="block text-sm font-medium text-gray-700">Full Name</label>
                         <input id="name" type="text"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 transition duration-150" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Email</label>
                         <input id="email" type="email" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 transition duration-150" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Password</label>
                         <input id="password" type="password" required
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500" />
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 transition duration-150" />
                     </div>
                 </div>
                 <button id="submitButton" type="submit"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white stackoverflow-orange focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">Sign
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white stackoverflow-orange transition duration-150">Sign
                     In</button>
                 <div class="text-center">
-                    <a href="#" id="toggleFormLink" class="text-sm text-blue-600 hover:text-blue-800">Don't have an
+                    <a href="#" id="toggleFormLink" class="text-sm link-blue">Don't have an
                         account? Sign Up</a>
                 </div>
             </form>
@@ -122,36 +311,36 @@
     </div>
 
     <div id="forumScreen" class="hidden">
-        <header class="bg-white border-b border-gray-300 shadow-sm">
+        <!-- UPDATED NAVBAR: Added gradient and shadow -->
+        <header class="bg-gradient-to-r from-white to-gray-50 border-b border-gray-300 shadow-lg sticky top-0 z-10">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex items-center justify-between h-14">
                     <div class="flex items-center space-x-8">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                                <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <div class="flex items-center space-x-1">
+                            <div class="w-8 h-8 bg-orange-500 rounded flex items-center justify-center"><svg
+                                    class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M18.986 10.5l-6.5 3.75v-7.5l6.5 3.75zm-13.5 0l6.5-3.75v7.5l-6.5-3.75z" />
-                                </svg>
-                            </div>
-                            <span class="text-xl font-bold text-gray-900">student<span
-                                    class="font-normal">forum</span></span>
+                                </svg></div>
+                            <span class="text-xl forum-logo-text text-gray-900 font-bold">student<span
+                                    class="font-light">forum</span></span>
                         </div>
                         <nav class="flex space-x-6">
                             <a href="#" onclick="showQuestionsView()"
-                                class="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Questions</a>
+                                class="text-gray-700 hover:text-orange-600 px-3 py-2 text-sm font-medium transition duration-150">Questions</a>
                             <a href="#" id="adminLink" onclick="showAdminView()"
-                                class="hidden text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">Admin</a>
+                                class="hidden text-gray-700 hover:text-orange-600 px-3 py-2 text-sm font-medium transition duration-150">Admin</a>
                         </nav>
                     </div>
                     <div class="flex items-center space-x-4">
                         <button onclick="showAskQuestion()"
-                            class="stackoverflow-orange text-white px-3 py-2 rounded text-sm font-medium hover:bg-orange-600">Ask
+                            class="stackoverflow-orange text-white px-3 py-1.5 rounded text-sm font-medium transition duration-150 hover:shadow-md">Ask
                             Question</button>
                         <div class="flex items-center space-x-2">
                             <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center"><span
                                     class="text-white text-sm font-medium" id="userInitials">U</span></div>
                             <span class="text-sm text-gray-700" id="userName">User</span>
                             <button onclick="logout()"
-                                class="text-sm text-gray-500 hover:text-gray-700">Logout</button>
+                                class="text-sm text-gray-500 hover:text-red-500 ml-2 transition duration-150">Logout</button>
                         </div>
                     </div>
                 </div>
@@ -160,54 +349,78 @@
         <div id="mainContent" class="max-w-7xl mx-auto px-4 py-6">
             <div id="questionsView">
                 <div class="flex">
-                    <div class="w-64 mr-8">
-                        <div class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
-                            <h3 class="font-semibold text-sm mb-2">The Overflow Blog</h3>
+                    <div class="w-64 mr-8" id="questionsSidebar">
+                        <div class="bg-white border border-gray-200 rounded p-4 mb-6 shadow-sm">
+                            <h3 class="font-semibold text-sm mb-2 text-gray-700">The Overflow Blog</h3>
                             <ul class="text-sm space-y-1">
-                                <li><a href="#" class="text-blue-600 hover:text-blue-800">Study tips for students</a>
-                                </li>
-                                <li><a href="#" class="text-blue-600 hover:text-blue-800">Best coding practices</a></li>
+                                <li><a href="#" class="link-blue">Study tips for students</a></li>
+                                <li><a href="#" class="link-blue">Best coding practices</a></li>
                             </ul>
                         </div>
                     </div>
                     <div class="flex-1">
-                        <div id="askQuestionForm" class="hidden bg-white border border-gray-300 rounded p-6 mb-6">
-                            <h2 class="text-xl font-semibold mb-4">Ask a Question</h2>
+                        <div class="mb-4">
+                            <input id="userSearchInput" type="text" onkeyup="filterQuestions()"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Search questions by title, body, tags, or user..." />
+                        </div>
+
+                        <div id="askQuestionForm"
+                            class="hidden bg-white border border-gray-300 rounded p-6 mb-6 shadow-lg">
+                            <h2 class="text-xl font-semibold mb-4 text-gray-800">Ask a Question</h2>
                             <form id="questionForm">
-                                <div class="mb-4"><label
-                                        class="block text-sm font-medium text-gray-700 mb-2">Title</label><input
-                                        type="text" id="questionTitle" required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="What's your programming question? Be specific."></div>
-                                <div class="mb-4"><label
-                                        class="block text-sm font-medium text-gray-700 mb-2">Body</label><textarea
-                                        id="questionBody" rows="6" required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Include all the information someone would need to answer your question"></textarea>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Title: Be specific and imagine you’re asking a question to another person.</label>
+                                    <input type="text" id="questionTitle" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                                        placeholder="e.g., How can I pass a function as a prop in React?">
                                 </div>
-                                <div class="mb-4"><label
-                                        class="block text-sm font-medium text-gray-700 mb-2">Tags</label><input
-                                        type="text" id="questionTags"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="e.g. javascript python html"></div>
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">What are the details of your problem? Introduce the problem and expand on what you put in the title. Minimum 20 characters.</label>
+                                    
+                                    <!-- Rich Text Toolbar for Question Body -->
+                                    <div class="flex space-x-2 mb-1">
+                                        <button type="button" onclick="wrapSelection('questionBody', '*', '*')" class="font-bold border border-gray-300 rounded px-2 py-0.5 text-sm hover:bg-gray-200">B</button>
+                                        <button type="button" onclick="wrapSelection('questionBody', '_', '_')" class="italic border border-gray-300 rounded px-2 py-0.5 text-sm hover:bg-gray-200">I</button>
+                                    </div>
+                                    
+                                    <textarea id="questionBody" rows="6" required minlength="20"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                                        placeholder="Describe your issue, including expected and actual behavior, and any relevant code snippets. Use *text* for bold and _text_ for italic."></textarea>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tags (Max 5)</label>
+                                    <div id="selectedTagsContainer" class="flex flex-wrap space-x-2 mb-2"></div>
+                                    <select id="tagSelectDropdown" onchange="addTagFromDropdown(this.value)"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                                        <option value="" disabled selected>Select a tag...</option>
+                                    </select>
+                                </div>
+                                <input type="hidden" id="questionTags" value="" />
                                 <div class="flex space-x-3">
                                     <button type="submit"
-                                        class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium">Post
+                                        class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium transition duration-150">Post
                                         Your Question</button>
                                     <button type="button" onclick="hideAskQuestion()"
-                                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-400">Cancel</button>
+                                        class="bg-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-400 transition duration-150">Cancel</button>
                                 </div>
                             </form>
                         </div>
-                        <div class="flex items-center justify-between mb-6">
-                            <h1 class="text-2xl font-semibold">All Questions</h1>
+                        <div class="flex items-center justify-between mb-4">
+                            <h1 class="text-2xl font-semibold text-gray-800">All Questions</h1>
                         </div>
-                        <div id="questionsList" class="space-y-0"></div>
+                        <div id="questionsList" class="space-y-0 border-t border-gray-200"></div>
                     </div>
                 </div>
             </div>
             <div id="adminView" class="hidden">
-                <h1 class="text-2xl font-semibold mb-6">Admin Dashboard</h1>
+                <div class="mb-6">
+                    <input id="adminSearchInput" type="text" onkeyup="loadAdminData()"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Search users, questions, or tags in Admin Dashboard..." />
+                </div>
+                <h1 class="text-2xl font-semibold mb-6 text-gray-800">Admin Dashboard</h1>
                 <div id="adminUserList" class="space-y-8"></div>
             </div>
         </div>
@@ -232,41 +445,159 @@
 
         let currentUser = null;
         const ADMIN_EMAIL = "admin@forum.com";
-        const ADMIN_PASSWORD = "admin123"; // Admin credentials for direct login
+        const ADMIN_PASSWORD = "admin123";
+        const PREDEFINED_TAGS = ['Python', 'JavaScript', 'HTML', 'CSS', 'Flutter', 'Dart', 'Java', 'C#', 'SQL', 'React', 'Nodejs', 'Firebase', 'Data-Science', 'C++', 'Go', 'PHP', 'Angular', 'Vue.js', 'AWS', 'Docker', 'Kubernetes'];
+        let allQuestionsCache = {};
+        
+        let sessionViewedQuestions = new Set();
 
-        const loginScreen = document.getElementById('loginScreen');
-        const forumScreen = document.getElementById('forumScreen');
-        const authForm = document.getElementById('authForm');
-        const nameInputContainer = document.getElementById('nameInputContainer');
-        const formTitle = document.getElementById('formTitle');
-        const formSubtitle = document.getElementById('formSubtitle');
-        const submitButton = document.getElementById('submitButton');
-        const toggleFormLink = document.getElementById('toggleFormLink');
-        const adminLink = document.getElementById('adminLink');
+        const tagSelectDropdown = document.getElementById('tagSelectDropdown');
+        const selectedTagsContainer = document.getElementById('selectedTagsContainer');
         const questionsView = document.getElementById('questionsView');
         const adminView = document.getElementById('adminView');
+        const adminSearchInput = document.getElementById('adminSearchInput');
+
 
         let isLoginMode = true;
 
-        // Utility to convert email to firebase key
+        // Populate the predefined tags dropdown on load
+        PREDEFINED_TAGS.forEach(tag => {
+            const option = document.createElement('option');
+            option.value = tag;
+            option.textContent = tag;
+            tagSelectDropdown.appendChild(option);
+        });
+
+        /* --- Content Rendering and Utility Functions --- */
+
+        // Function to apply simple markdown and preserve whitespace
+        function renderBody(text) {
+            // Apply simple markdown: *bold* and _italic_
+            let html = text.replace(/\*([^\*]+)\*/g, '<strong>$1</strong>');
+            html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+            
+            // Use <pre> with a class to preserve line breaks and spaces
+            return `<pre class="body-content text-sm">${html}</pre>`;
+        }
+        
+        // Function to truncate text for Admin panel
+        function truncateText(text, limit) {
+            const words = text.split(/\s+/);
+            if (words.length <= limit) {
+                return text;
+            }
+            return words.slice(0, limit).join(' ') + '...';
+        }
+
+        /* --- Rich Text Selection Wrapper (NEW) --- */
+        function wrapSelection(textareaId, prefix, suffix) {
+            const textarea = document.getElementById(textareaId);
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            // Check if the selected text already contains the wrapper
+            let replacement;
+            if (selectedText.startsWith(prefix) && selectedText.endsWith(suffix) && selectedText.length > prefix.length + suffix.length) {
+                // Unwrap
+                replacement = selectedText.substring(prefix.length, selectedText.length - suffix.length);
+            } else {
+                // Wrap
+                replacement = prefix + selectedText + suffix;
+            }
+
+            textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+            
+            // Restore focus and selection
+            textarea.focus();
+            if (selectedText && replacement.length > 0) {
+                // Keep the entire wrapped or unwrapped section selected
+                textarea.selectionStart = start;
+                textarea.selectionEnd = start + replacement.length;
+            } else {
+                // If nothing was selected, place cursor in the middle of the wrappers
+                textarea.selectionStart = textarea.selectionEnd = start + prefix.length;
+            }
+        }
+        window.wrapSelection = wrapSelection;
+
+
+        /* --- Toast Notification System --- */
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.textContent = message;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                const removeToast = () => {
+                    toast.remove();
+                    toast.removeEventListener('transitionend', removeToast);
+                };
+                toast.addEventListener('transitionend', removeToast);
+            }, 3000);
+        }
+
+        /* --- Tag Management Functions --- */
+        function updateSelectedTagsInput() {
+            const currentTags = Array.from(selectedTagsContainer.children).map(el => el.dataset.tag);
+            document.getElementById('questionTags').value = currentTags.join(' ');
+        }
+
+        function removeTag(tagToRemove) {
+            const tagElement = selectedTagsContainer.querySelector(`[data-tag="${tagToRemove}"]`);
+            if (tagElement) {
+                tagElement.remove();
+                const option = tagSelectDropdown.querySelector(`option[value="${tagToRemove}"]`);
+                if (option) option.disabled = false;
+                updateSelectedTagsInput();
+            }
+        }
+
+        function addTagFromDropdown(tag) {
+            if (!tag || tag === 'Select a tag...') return;
+            const currentTagsCount = selectedTagsContainer.children.length;
+            if (currentTagsCount >= 5) {
+                showToast("You can select a maximum of 5 tags.", true);
+                tagSelectDropdown.value = '';
+                return;
+            }
+
+            const tagElement = document.createElement('span');
+            tagElement.className = 'tag-style flex items-center mb-1 mr-2';
+            tagElement.dataset.tag = tag;
+            tagElement.innerHTML = `${tag} <button type="button" class="ml-1 text-xs font-bold leading-none opacity-70 hover:opacity-100" onclick="removeTag('${tag}')">x</button>`;
+
+            selectedTagsContainer.appendChild(tagElement);
+            tagSelectDropdown.querySelector(`option[value="${tag}"]`).disabled = true;
+            tagSelectDropdown.value = '';
+            updateSelectedTagsInput();
+        }
+
+        /* --- Auth & UI Functions --- */
         function emailToKey(email) {
             return email.replace(/\./g, '_');
         }
 
-        // Toggle login/register
-        toggleFormLink.addEventListener('click', (e) => {
+        document.getElementById('toggleFormLink').addEventListener('click', (e) => {
             e.preventDefault();
             isLoginMode = !isLoginMode;
-            nameInputContainer.classList.toggle('hidden', isLoginMode);
-            formTitle.textContent = isLoginMode ? 'Sign In' : 'Sign Up';
-            formSubtitle.textContent = isLoginMode ? 'Sign in to your account' : 'Create a new account';
-            submitButton.textContent = isLoginMode ? 'Sign In' : 'Sign Up';
-            toggleFormLink.textContent = isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
-            authForm.reset();
+            document.getElementById('nameInputContainer').classList.toggle('hidden', isLoginMode);
+            document.getElementById('formTitle').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
+            document.getElementById('formSubtitle').textContent = isLoginMode ? 'Sign in to your account' : 'Create a new account';
+            document.getElementById('submitButton').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
+            document.getElementById('toggleFormLink').textContent = isLoginMode ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
+            document.getElementById('authForm').reset();
         });
 
-        // Handle auth form
-        authForm.addEventListener('submit', async (e) => {
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.toLowerCase().trim();
@@ -275,77 +606,88 @@
             const userRef = database.ref('users/' + userKey);
 
             if (isLoginMode) {
-                // Admin Login Check
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                     setupSession({ name: "Admin", email: ADMIN_EMAIL, initials: "A", isAdmin: true });
+                    showToast("Admin login successful! Welcome.");
                     return;
                 }
-                // Regular User Login
                 const snapshot = await userRef.once('value');
                 const user = snapshot.val();
                 if (user && user.password === password) {
                     setupSession(user);
+                    showToast("Login successful! Welcome.");
                 } else {
-                    alert("Invalid email or password.");
+                    showToast("Invalid email or password.", true);
                 }
             } else { // Register
-                if (!name) { alert("Please enter your full name."); return; }
+                if (!name) { showToast("Please enter your full name.", true); return; }
                 const snapshot = await userRef.once('value');
                 if (snapshot.exists()) {
-                    alert("This email is already registered. Please sign in.");
+                    showToast("This email is already registered. Please sign in.", true);
                 } else {
-                    const newUser = {
-                        name,
-                        email,
-                        password,
-                        initials: name.charAt(0).toUpperCase(),
-                        isAdmin: false
-                    };
+                    const newUser = { name, email, password, initials: name.charAt(0).toUpperCase(), isAdmin: false };
                     await userRef.set(newUser);
-                    alert("Registration successful! You can now sign in.");
+                    showToast("Registration successful! Please sign in.");
                     document.getElementById('toggleFormLink').click();
                 }
             }
         });
 
-        // Setup session
         function setupSession(user) {
             currentUser = user;
+            sessionViewedQuestions.clear();
             document.getElementById('userName').textContent = currentUser.name;
             document.getElementById('userInitials').textContent = currentUser.initials;
-            adminLink.classList.toggle('hidden', !currentUser.isAdmin);
-            loginScreen.classList.add('hidden');
-            forumScreen.classList.remove('hidden');
+            document.getElementById('adminLink').classList.toggle('hidden', !currentUser.isAdmin);
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('forumScreen').classList.remove('hidden');
             showQuestionsView();
         }
 
-        // Logout
         function logout() {
             currentUser = null;
-            loginScreen.classList.remove('hidden');
-            forumScreen.classList.add('hidden');
-            authForm.reset();
+            sessionViewedQuestions.clear();
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('forumScreen').classList.add('hidden');
+            document.getElementById('authForm').reset();
+            showToast("Logged out successfully.");
         }
 
-        // View toggles
         function showQuestionsView() {
             questionsView.style.display = 'block';
             adminView.style.display = 'none';
+            document.getElementById('questionsSidebar').style.display = 'block';
+            document.getElementById('userSearchInput').value = '';
+            filterQuestions();
         }
         function showAdminView() {
             if (!currentUser || !currentUser.isAdmin) {
-                alert("Access Denied.");
+                showToast("Access Denied.", true);
                 showQuestionsView();
                 return;
             }
             questionsView.style.display = 'none';
             adminView.style.display = 'block';
+            document.getElementById('questionsSidebar').style.display = 'none';
+            adminSearchInput.value = '';
             loadAdminData();
         }
 
-        // Show/hide ask question form
-        function showAskQuestion() { document.getElementById('askQuestionForm').classList.remove('hidden'); }
-        function hideAskQuestion() { document.getElementById('askQuestionForm').classList.add('hidden'); document.getElementById('questionForm').reset(); }
+        function showAskQuestion() {
+            document.getElementById('askQuestionForm').classList.remove('hidden');
+            selectedTagsContainer.innerHTML = '';
+            document.getElementById('questionTags').value = '';
+            PREDEFINED_TAGS.forEach(tag => {
+                const option = tagSelectDropdown.querySelector(`option[value="${tag}"]`);
+                if (option) option.disabled = false;
+            });
+            tagSelectDropdown.value = '';
+        }
+        function hideAskQuestion() {
+            document.getElementById('askQuestionForm').classList.add('hidden');
+            document.getElementById('questionForm').reset();
+            selectedTagsContainer.innerHTML = '';
+        }
 
         // Submit question
         document.getElementById('questionForm').addEventListener('submit', (e) => {
@@ -353,21 +695,26 @@
             const title = document.getElementById('questionTitle').value.trim();
             const body = document.getElementById('questionBody').value.trim();
             const tags = document.getElementById('questionTags').value.trim();
-            if (title && body && currentUser) {
-                // Using push() to get a unique key, then set the data
+
+            if (title && body.length >= 20 && currentUser) {
                 const newQuestionRef = database.ref('questions').push();
                 const questionId = newQuestionRef.key;
+                const tagsArray = tags ? tags.split(' ').filter(t => t.trim()) : [];
+
                 const question = {
                     id: questionId,
-                    title,
-                    body,
-                    tags: tags ? tags.split(' ').filter(t => t.trim()) : [],
+                    title, body, tags: tagsArray,
                     user: { name: currentUser.name, email: currentUser.email, initials: currentUser.initials },
                     votes: 0,
+                    voters: {},
                     created: new Date().toISOString(),
+                    views: 0,
                 };
                 newQuestionRef.set(question);
                 hideAskQuestion();
+                showToast("Question posted successfully!");
+            } else if (body.length < 20) {
+                showToast("Question body must be at least 20 characters.", true);
             }
         });
 
@@ -376,205 +723,385 @@
             event.preventDefault();
             const textarea = event.target.querySelector('textarea');
             const answerText = textarea.value.trim();
-            if (!answerText || !currentUser) return;
-            // Using push() to get a unique key for the answer
+            if (!answerText || !currentUser) {
+                showToast("Please sign in to post an answer.", true);
+                return;
+            }
+
             const newAnswerRef = database.ref(`questions/${questionId}/answers`).push();
             const answerId = newAnswerRef.key;
             const answer = {
-                id: answerId,
-                body: answerText,
+                id: answerId, body: answerText,
                 user: { name: currentUser.name, email: currentUser.email, initials: currentUser.initials },
-                votes: 0,
+                votes: 0, voters: {},
                 created: new Date().toISOString()
             };
             newAnswerRef.set(answer);
             textarea.value = '';
+            showToast("Answer posted successfully!");
         }
 
-        // Vote question
-        function voteQuestionHandler(questionId, direction) {
-            database.ref(`questions/${questionId}/votes`).transaction((votes) => (votes || 0) + (direction === 'up' ? 1 : -1));
+        /* --- Voting Logic (One Vote Per User Per Answer) --- */
+        function processVoteTransaction(ref, direction, userKey) {
+            ref.transaction((data) => {
+                if (data === null) { data = { votes: 0, voters: {} }; }
+                data.votes = data.votes || 0;
+                data.voters = data.voters || {};
+
+                const currentVote = data.voters[userKey] || 0;
+                const delta = (direction === 'up' ? 1 : -1);
+
+                if (currentVote === delta) {
+                    data.votes -= delta;
+                    delete data.voters[userKey];
+                } else if (currentVote === 0) {
+                    data.votes += delta;
+                    data.voters[userKey] = delta;
+                } else {
+                    data.votes += (2 * delta);
+                    data.voters[userKey] = delta;
+                }
+                return data;
+            });
         }
 
-        // Vote answer
         function voteAnswerHandler(questionId, answerId, direction) {
-            database.ref(`questions/${questionId}/answers/${answerId}/votes`).transaction((votes) => (votes || 0) + (direction === 'up' ? 1 : -1));
+            if (!currentUser || currentUser.isAdmin) return showToast(currentUser ? "Admins cannot vote." : "Please sign in to vote.", true);
+            const userKey = emailToKey(currentUser.email);
+            const votesRef = database.ref(`questions/${questionId}/answers/${answerId}`);
+            processVoteTransaction(votesRef, direction, userKey);
         }
 
-        // Toggle answers display
-        function toggleAnswers(titleElement) {
-            const answersSection = titleElement.closest('.question-item').querySelector('.answers-section');
+        // Toggle answers display (View count increment FIXED)
+        function toggleAnswers(titleElement, questionId) {
+            const questionItem = titleElement.closest('.question-item');
+            const answersSection = questionItem.querySelector('.answers-detail-wrapper');
+            const isHidden = answersSection.classList.contains('hidden');
             answersSection.classList.toggle('hidden');
+
+            if (isHidden && currentUser && !currentUser.isAdmin) {
+                if (!sessionViewedQuestions.has(questionId)) {
+                    database.ref(`questions/${questionId}/views`).transaction(currentViews => {
+                        if (currentViews === null) currentViews = 0;
+                        return currentViews + 1;
+                    }).then(() => {
+                        sessionViewedQuestions.add(questionId);
+                    });
+                }
+            }
         }
 
-        // Render functions
-        function renderQuestions(questionsObj) {
+        /* --- Render functions with Professional UI --- */
+
+        function filterQuestions() {
+            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase().trim();
+
+            if (!allQuestionsCache) return;
+
+            const filteredQuestions = Object.values(allQuestionsCache).filter(q => {
+                if (searchTerm === '') return true;
+
+                const qLower = q.title.toLowerCase() + q.body.toLowerCase() + q.tags.map(t => t.toLowerCase()).join(' ');
+                if (qLower.includes(searchTerm)) return true;
+
+                if (q.user && (q.user.name.toLowerCase().includes(searchTerm) || q.user.email.toLowerCase().includes(searchTerm))) return true;
+
+                if (q.answers) {
+                    return Object.values(q.answers).some(a =>
+                        a.user && (a.user.name.toLowerCase().includes(searchTerm) || a.user.email.toLowerCase().includes(searchTerm))
+                    );
+                }
+
+                return false;
+            }).sort((a, b) => b.created.localeCompare(a.created));
+
+            renderQuestionList(filteredQuestions);
+        }
+
+        function renderQuestionList(questionsArr) {
             const list = document.getElementById('questionsList');
             list.innerHTML = '';
-            if (!questionsObj) return;
-            const questionsArr = Object.values(questionsObj).sort((a, b) => b.created.localeCompare(a.created));
+
             questionsArr.forEach(q => {
-                // Ensure properties are present to avoid render errors
                 q.answers = q.answers || {};
                 q.user = q.user || {};
                 q.tags = q.tags || [];
 
-                // Use the Firebase key (q.id) which may be a long string, so interpolation must be quoted
                 const qid = q.id;
-
                 const answersCount = Object.keys(q.answers).length;
-                const votesCount = q.votes || 0;
                 const createdDate = new Date(q.created).toLocaleString();
-                const tagsHTML = q.tags.map(tag => `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${tag}</span>`).join(' ');
+                const tagsHTML = q.tags.map(tag => `<span class="tag-style">${tag}</span>`).join(' ');
+
+                const totalVotes = Object.values(q.answers).reduce((sum, a) => sum + (a.votes || 0), 0);
+                const questionViews = q.views || 0;
+
+                const answerStatClass = answersCount > 0 ? 'answer-stat-green' : 'answer-stat-zero';
+
                 const item = document.createElement('div');
-                item.className = 'question-item border-b border-gray-200 py-4 flex';
+                item.className = 'question-item flex hover:bg-gray-50 transition duration-150';
+                
+                const answerTextareaId = `answer-textarea-${qid}`;
+
                 item.innerHTML = `
-                    <div class="w-24 text-center mr-4 text-sm flex flex-col items-center">
-                        <div class="vote-arrow up" onclick="voteQuestionHandler('${qid}', 'up')"></div>
-                        <div class="text-lg font-bold text-gray-600 my-2">${votesCount}</div>
-                        <div class="vote-arrow down" onclick="voteQuestionHandler('${qid}', 'down')"></div>
-                        <div class="mt-2"><span class="font-semibold">${answersCount}</span><div class="question-stats">answers</div></div>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-blue-600 hover:text-blue-800 cursor-pointer text-lg mb-2">${q.title}</h3>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2">${tagsHTML}</div>
-                            <div class="user-card">
-                                <div class="text-blue-600 text-xs">asked ${createdDate}</div>
-                                <div class="flex items-center space-x-1 mt-1">
-                                    <span class="text-blue-600 font-medium">${q.user.name || 'Unknown'}</span>
+                    <div class="flex-1 pl-4 pt-1 pb-1">
+                        <h3 class="mb-2">
+                            <a href="#" class="question-title-link link-blue cursor-pointer" data-qid="${qid}">${q.title}</a>
+                        </h3>
+                        
+                        <p class="text-sm text-gray-700 mb-2 truncate max-w-2xl">${q.body.replace(/\s+/g, ' ')}</p>
+
+                        <div class="flex items-center justify-between mt-1">
+                            
+                            <!-- Tags and Horizontal Stats -->
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-2">${tagsHTML}</div>
+
+                                <div class="horizontal-stats">
+                                    <div class="stat-item flex">
+                                        <span class="stat-number">${totalVotes}</span>
+                                        <span class="stat-label ml-1">votes</span>
+                                    </div>
+                                    <div class="stat-item flex ${answerStatClass}">
+                                        <span class="stat-number">${answersCount}</span>
+                                        <span class="stat-label ml-1">answers</span>
+                                    </div>
+                                    <div class="stat-item flex">
+                                        <span class="stat-number">${questionViews}</span>
+                                        <span class="stat-label ml-1">views</span>
+                                    </div>
                                 </div>
                             </div>
+                            
+                            <!-- User Card -->
+                            <div class="user-card">
+                                <div class="text-xs text-gray-500">asked ${createdDate}</div>
+                                <div class="user-name">${q.user.name || 'Unknown'}</div>
+                            </div>
                         </div>
-                        <div class="answers-section hidden mt-6">
-                            <p class="text-gray-700 text-sm mb-4">${q.body}</p>
-                            <div class="answer-section">
-                                <h4 class="font-semibold mb-4">${answersCount} Answer${answersCount !== 1 ? 's' : ''}</h4>
-                                ${renderAnswers(q)}
+
+                        <!-- Answers Detail Wrapper (Content) -->
+                        <div class="answers-detail-wrapper hidden mt-6 bg-white p-4 border border-gray-200 rounded shadow-sm">
+                            <div class="p-2 border-l-4 border-gray-300 bg-gray-50 mb-6">
+                                ${renderBody(q.body)}
+                            </div>
+
+                            <div class="answers-section-detail">
+                                <h4 class="font-semibold mb-4 text-gray-800">${answersCount} Answer${answersCount !== 1 ? 's' : ''}</h4>
+                                <div id="answers-list-${qid}">
+                                    ${renderAnswers(q)}
+                                </div>
+
+                                <!-- Post Answer Form -->
                                 <div class="mt-6 border-t border-gray-200 pt-6">
-                                    <h5 class="font-semibold mb-3">Your Answer</h5>
-                                    <form onsubmit="addAnswerHandler(event, '${qid}')">
-                                        <textarea rows="5" required class="w-full px-3 py-2 border border-gray-300 rounded mb-3"></textarea>
-                                        <button type="submit" class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium">Post Answer</button>
+                                    <h5 class="font-semibold mb-3 text-gray-800">Your Answer</h5>
+                                    <form class="answer-form">
+                                        <!-- Rich Text Toolbar for Answer Body -->
+                                        <div class="flex space-x-2 mb-1">
+                                            <button type="button" onclick="wrapSelection('${answerTextareaId}', '*', '*')" class="font-bold border border-gray-300 rounded px-2 py-0.5 text-sm hover:bg-gray-200">B</button>
+                                            <button type="button" onclick="wrapSelection('${answerTextareaId}', '_', '_')" class="italic border border-gray-300 rounded px-2 py-0.5 text-sm hover:bg-gray-200">I</button>
+                                        </div>
+                                        <textarea id="${answerTextareaId}" rows="5" required class="w-full px-3 py-2 border border-gray-300 rounded mb-3 focus:ring-blue-500 focus:border-blue-500 transition duration-150" placeholder="Use *text* for bold and _text_ for italic."></textarea>
+                                        <button type="submit" class="stackoverflow-orange text-white px-4 py-2 rounded text-sm font-medium transition duration-150">Post Your Answer</button>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     </div>`;
-                const titleEl = item.querySelector('h3');
-                titleEl.addEventListener('click', () => toggleAnswers(titleEl));
                 list.appendChild(item);
+                
+                // FIX: Attach event listeners after element is added to DOM
+                item.querySelector('.question-title-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    toggleAnswers(e.currentTarget, qid);
+                });
+
+                const answerForm = item.querySelector('.answer-form');
+                if (answerForm) {
+                    answerForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        addAnswerHandler(e, qid);
+                    });
+                }
             });
         }
 
         function renderAnswers(question) {
-            if (!question.answers) return '';
-            // Map keys/values to array for sorting, using key as ID (since we switched to push keys)
+            if (!question.answers) return '<p class="text-gray-500 text-sm p-2">No answers yet.</p>';
+
             const answersArr = Object.keys(question.answers).map(key => ({ ...question.answers[key], id: key }));
-            answersArr.sort((a, b) => b.created.localeCompare(a.created));
+            answersArr.sort((a, b) => b.votes - a.votes || b.created.localeCompare(a.created));
 
             const qid = question.id;
+            const isVotingAllowed = currentUser && !currentUser.isAdmin;
+            const userKey = currentUser ? emailToKey(currentUser.email) : null;
 
-            return answersArr.map(a => `
-                <div class="answer mb-6 flex border-t border-gray-200 pt-4">
-                    <div class="w-12 mr-4 flex flex-col items-center">
-                        <div class="vote-arrow up" onclick="voteAnswerHandler('${qid}', '${a.id}', 'up')"></div>
-                        <div class="text-lg font-bold text-gray-600 my-2">${a.votes || 0}</div>
-                        <div class="vote-arrow down" onclick="voteAnswerHandler('${qid}', '${a.id}', 'down')"></div>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-gray-700 mb-4">${a.body}</p>
-                        <div class="user-card inline-block">
-                            <div class="text-blue-600 text-xs">answered ${new Date(a.created).toLocaleString()}</div>
-                            <div class="flex items-center space-x-1 mt-1">
-                                <span class="text-blue-600 font-medium">${a.user?.name || 'Unknown'}</span>
+            return answersArr.map(a => {
+                const answerVoted = a.voters && userKey ? a.voters[userKey] || 0 : 0;
+                const upClass = answerVoted === 1 ? 'voted' : '';
+                const downClass = answerVoted === -1 ? 'voted' : '';
+                const disabledClass = isVotingAllowed ? '' : 'disabled';
+                const votesCount = a.votes || 0;
+                
+                const upCursorStyle = (answerVoted === 1 || !isVotingAllowed) ? 'cursor: default !important;' : '';
+                const downCursorStyle = (answerVoted === -1 || !isVotingAllowed) ? 'cursor: default !important;' : '';
+
+                return `
+                    <div class="answer mb-6 flex pt-4 border-b border-gray-100 pb-4 bg-gray-50 rounded-md shadow-sm">
+                        
+                        <!-- Voting Column -->
+                        <div class="w-12 mr-4 flex flex-col items-center pt-2">
+                            <div class="vote-arrow up ${upClass} ${disabledClass}" onclick="${isVotingAllowed ? `voteAnswerHandler('${qid}', '${a.id}', 'up')` : ''}" style="${upCursorStyle}"></div>
+                            <div class="text-xl font-bold text-gray-800 my-2">${votesCount}</div>
+                            <div class="vote-arrow down ${downClass} ${disabledClass}" onclick="${isVotingAllowed ? `voteAnswerHandler('${qid}', '${a.id}', 'down')` : ''}" style="${downCursorStyle}"></div>
+                        </div>
+                        
+                        <!-- Answer Content and User Card -->
+                        <div class="flex-1 pr-2">
+                            <div class="bg-white p-3 rounded border border-gray-200 mb-3">
+                                ${renderBody(a.body)}
+                            </div>
+                            
+                            <div class="user-card inline-block float-right mt-2">
+                                <div class="text-xs text-gray-500">answered ${new Date(a.created).toLocaleString()}</div>
+                                <div class="user-name">${a.user?.name || 'Unknown'}</div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        // --- Admin Functions ---
+        /* --- Admin Functions --- */
 
-        // Function to remove a user
         function removeUser(userKey, userName) {
             if (!confirm(`Are you sure you want to permanently remove user: ${userName}? This action cannot be undone.`)) return;
             database.ref('users/' + userKey).remove()
                 .then(() => {
-                    alert(`User ${userName} removed.`);
-                    loadAdminData(); // Refresh admin view
+                    showToast(`User ${userName} removed.`);
+                    loadAdminData();
                 })
                 .catch(error => console.error("Error removing user:", error));
         }
 
-        // Function to remove a question
         function removeQuestion(questionId, questionTitle) {
             if (!confirm(`Are you sure you want to remove the question: "${questionTitle}"?`)) return;
             database.ref('questions/' + questionId).remove()
-                .then(() => alert("Question removed."))
+                .then(() => showToast("Question removed."))
                 .catch(error => console.error("Error removing question:", error));
-            // Real-time listener handles the refresh
         }
 
-        // Function to remove a specific answer
         function removeAnswer(questionId, answerId) {
             if (!confirm('Are you sure you want to remove this answer?')) return;
             database.ref(`questions/${questionId}/answers/${answerId}`).remove()
-                .then(() => alert("Answer removed."))
+                .then(() => showToast("Answer removed."))
                 .catch(error => console.error("Error removing answer:", error));
-            // Real-time listener handles the refresh
         }
 
-        // Load admin data
+        function toggleAdminAnswer(button, fullText) {
+            const li = button.closest('li');
+            const span = li.querySelector('.answer-text-content');
+            
+            if (span.dataset.truncated === 'true') {
+                span.innerHTML = renderBody(fullText);
+                span.dataset.truncated = 'false';
+                button.textContent = '[...Read Less]';
+            } else {
+                const truncatedText = truncateText(fullText, 15);
+                span.innerHTML = renderBody(truncatedText);
+                span.dataset.truncated = 'true';
+                button.textContent = '[...Read More]';
+            }
+        }
+        window.toggleAdminAnswer = toggleAdminAnswer;
+
+        // Admin Search Function (UPDATED: Calculates answer count)
         async function loadAdminData() {
+            const searchTerm = adminSearchInput.value.toLowerCase().trim();
             const usersSnapshot = await database.ref('users').once('value');
             const questionsSnapshot = await database.ref('questions').once('value');
             const users = usersSnapshot.val() || {};
             const questions = questionsSnapshot.val() || {};
 
             const userListDiv = document.getElementById('adminUserList');
-            userListDiv.innerHTML = '<h2 class="text-xl font-bold mb-4">Registered Users</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="userGrid"></div><h2 class="text-xl font-bold mt-8 mb-4">All Questions</h2><div id="questionAdminList" class="space-y-4"></div>';
+            userListDiv.innerHTML = '<h2 class="text-xl font-bold mb-4 text-gray-800">Registered Users</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="userGrid"></div><h2 class="text-xl font-bold mt-8 mb-4 text-gray-800">All Forum Content</h2><div id="questionAdminList" class="space-y-4"></div>';
             const userGrid = document.getElementById('userGrid');
             const questionAdminList = document.getElementById('questionAdminList');
 
-            // Render Users
-            for (const key in users) {
-                const user = users[key];
-                if (!user || !user.email || user.isAdmin) continue; // Skip admin
-                const userKey = key;
-                const userQuestions = Object.values(questions).filter(q => q.user?.email === user.email);
+            const usersArray = Object.keys(users).map(key => ({ key, ...users[key], answersCount: 0 }));
+            const questionsArray = Object.values(questions);
+            
+            // Calculate total answers per user
+            const userAnswersCount = {};
+            questionsArray.forEach(q => {
+                if (q.answers) {
+                    Object.values(q.answers).forEach(a => {
+                        if (a.user && a.user.email) {
+                            userAnswersCount[a.user.email] = (userAnswersCount[a.user.email] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            // Render Users (filtered)
+            usersArray.filter(user => {
+                if (user.isAdmin) return false;
+                if (searchTerm === '') return true;
+                const searchArea = `${user.name.toLowerCase()} ${user.email.toLowerCase()}`;
+                return searchArea.includes(searchTerm);
+            }).forEach(user => {
+                const userKey = user.key;
+                const userQuestions = questionsArray.filter(q => q.user?.email === user.email);
+                const answersGiven = userAnswersCount[user.email] || 0; // Get calculated answer count
+
                 const userCard = document.createElement('div');
-                userCard.className = 'bg-white p-4 rounded-lg shadow border border-gray-200';
+                userCard.className = 'bg-white p-4 rounded-lg shadow-md border border-gray-200';
                 userCard.innerHTML = `
-                    <h3 class="font-bold text-lg">${user.name}</h3>
+                    <h3 class="font-bold text-lg text-gray-800">${user.name}</h3>
                     <p class="text-sm text-gray-600">${user.email}</p>
                     <p class="text-xs text-gray-500 mt-1">${userQuestions.length} Questions Asked</p>
-                    <button onclick="removeUser('${userKey}', '${user.name}')" class="mt-3 bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600 transition">Remove User</button>
+                    <p class="text-xs text-gray-500 mt-1 font-semibold">${answersGiven} Answers Posted</p>
+                    <button onclick="removeUser('${userKey}', '${user.name}')" class="mt-3 bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600 transition duration-150">Remove User</button>
                 `;
                 userGrid.appendChild(userCard);
-            }
+            });
 
-            // Render Questions for Admin
-            const questionsArr = Object.values(questions).sort((a, b) => b.created.localeCompare(a.created));
-            questionsArr.forEach(q => {
+            // Render Questions for Admin (filtered)
+            questionsArray.filter(q => {
+                if (searchTerm === '') return true;
+                const searchArea = `${q.title.toLowerCase()} ${q.body.toLowerCase()} ${q.tags?.map(t => t.toLowerCase()).join(' ')} ${q.user?.name.toLowerCase()}`;
+                return searchArea.includes(searchTerm);
+            }).sort((a, b) => b.created.localeCompare(a.created)).forEach(q => {
                 const qid = q.id;
                 const answersArr = Object.keys(q.answers || {}).map(key => ({ ...q.answers[key], id: key }));
 
                 const questionItem = document.createElement('div');
-                questionItem.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+                questionItem.className = 'bg-white p-4 rounded-lg shadow-sm border border-gray-200';
                 questionItem.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h4 class="font-semibold text-base">${q.title} <span class="text-xs text-gray-500">(${q.user?.name})</span></h4>
-                        <button onclick="removeQuestion('${qid}', '${q.title}')" class="bg-red-500 text-white px-2 py-1 text-xs rounded hover:bg-red-600 transition">Remove Question</button>
+                    <div class="flex justify-between items-start mb-3 border-b pb-2">
+                        <h4 class="font-semibold text-base text-blue-800">${q.title} <span class="text-xs text-gray-500">by ${q.user?.name}</span></h4>
+                        <button onclick="removeQuestion('${qid}', '${q.title}')" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600 transition duration-150 ml-4">Remove Question</button>
                     </div>
-                    <ul class="ml-4 space-y-2 text-sm text-gray-700 border-t mt-2 pt-2">
-                        ${answersArr.map(a => `
-                            <li class="flex justify-between items-center bg-white p-2 rounded border border-gray-100">
-                                <span class="truncate pr-4">${a.body} <span class="text-xs text-gray-400">(${a.user?.name})</span></span>
-                                <button onclick="removeAnswer('${qid}', '${a.id}')" class="bg-red-400 text-white px-2 py-0.5 text-xs rounded hover:bg-red-500 transition ml-2">Remove Answer</button>
-                            </li>
-                        `).join('') || '<li>No answers.</li>'}
+                    <h5 class="text-sm font-medium mb-2 text-gray-700">Answers (${answersArr.length}):</h5>
+                    <ul class="ml-0 space-y-2 text-sm text-gray-700">
+                        ${answersArr.map(a => {
+                            const fullBody = a.body;
+                            const truncatedBody = truncateText(fullBody, 15);
+                            const needsMore = fullBody !== truncatedBody;
+                            return `
+                                <li class="flex justify-between items-start bg-gray-50 p-2 rounded border border-gray-100">
+                                    <div class="flex-1 min-w-0 pr-4">
+                                        <div class="text-xs text-gray-800">
+                                            <span class="answer-text-content" data-truncated="true">${renderBody(truncatedBody)}</span>
+                                            ${needsMore ? `<button onclick="toggleAdminAnswer(this, \`${fullBody.replace(/`/g, '\\`')}\`)" class="text-blue-500 text-xs ml-1 hover:text-blue-700">[...Read More]</button>` : ''}
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-1">
+                                            Answered by: <span class="font-medium">${a.user?.name}</span> | Votes: ${a.votes || 0}
+                                        </div>
+                                    </div>
+                                    <button onclick="removeAnswer('${qid}', '${a.id}')" class="bg-red-400 text-white px-2 py-0.5 text-xs rounded hover:bg-red-500 transition duration-150 ml-2 mt-1">Remove</button>
+                                </li>
+                            `;
+                        }).join('') || '<li class="text-gray-500 text-xs p-2">No answers yet.</li>'}
                     </ul>
                 `;
                 questionAdminList.appendChild(questionItem);
@@ -583,15 +1110,19 @@
 
         // Real-time questions listener
         database.ref("questions").on("value", (snapshot) => {
-            renderQuestions(snapshot.val());
-            // If the admin panel is open, refresh its question list too
-            if (adminView.style.display === 'block') {
-                loadAdminData();
+            allQuestionsCache = snapshot.val() || {};
+            if (questionsView.style.display === 'block') {
+                filterQuestions();
+            } else if (adminView.style.display === 'block') {
+                if (adminSearchInput.value.trim() === '') {
+                    loadAdminData();
+                }
+            } else if (!currentUser) {
+                filterQuestions();
             }
         });
 
         // Expose functions globally
-        window.voteQuestionHandler = voteQuestionHandler;
         window.voteAnswerHandler = voteAnswerHandler;
         window.addAnswerHandler = addAnswerHandler;
         window.showQuestionsView = showQuestionsView;
@@ -600,11 +1131,27 @@
         window.hideAskQuestion = hideAskQuestion;
         window.logout = logout;
         window.toggleAnswers = toggleAnswers;
-
-        // Admin functions exposure
+        window.filterQuestions = filterQuestions;
+        window.addTagFromDropdown = addTagFromDropdown;
+        window.removeTag = removeTag;
         window.removeUser = removeUser;
         window.removeQuestion = removeQuestion;
         window.removeAnswer = removeAnswer;
+        window.loadAdminData = loadAdminData;
+        window.renderBody = renderBody;
+        window.toggleAdminAnswer = toggleAdminAnswer;
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!currentUser) {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('forumScreen').classList.add('hidden');
+            } else {
+                document.getElementById('forumScreen').classList.remove('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
+                showQuestionsView();
+            }
+        });
     </script>
 </body>
 
